@@ -28,7 +28,8 @@
 
 #include "lcd.h"
 #include "lcd_init.h"
-#include "image.h"
+//#include "image.h"
+#include "textimg.h"
 
 /* USER CODE END Includes */
 
@@ -52,11 +53,45 @@
 /* USER CODE BEGIN PV */
 uint32_t prvetime = 0, currenttime = 0, time = 0;
 uint32_t fps = 0;
+uint16_t color = 0x0000;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+
 /* USER CODE BEGIN PFP */
+void LCD_Text(void) {
+    LCD_Fill(0, 12, LCD_W, LCD_H, 0x1f00);
+    LCD_Fill(0, 12, LCD_W, LCD_H, WHITE);
+    LCD_Fill(0, 12, LCD_W, LCD_H, RED);
+    LCD_Fill(0, 12, LCD_W, LCD_H, BLACK);
+    LCD_Fill(0, 12, LCD_W, LCD_H, BLUE);
+    LCD_Fill(0, 12, LCD_W, LCD_H, 0x1f00);
+    LCD_Fill(0, 12, LCD_W, LCD_H, WHITE);
+    LCD_Fill(0, 12, LCD_W, LCD_H, RED);
+    LCD_Fill(0, 12, LCD_W, LCD_H, BLACK);
+    LCD_Fill(0, 12, LCD_W, LCD_H, BLUE);
+    LCD_Fill(0, 12, LCD_W, LCD_H, 0x1f00);
+    LCD_Fill(0, 12, LCD_W, LCD_H, WHITE);
+    LCD_Fill(0, 12, LCD_W, LCD_H, RED);
+    LCD_Fill(0, 12, LCD_W, LCD_H, BLACK);
+    LCD_Fill(0, 12, LCD_W, LCD_H, BLUE);
+    LCD_Fill(0, 12, LCD_W, LCD_H, 0x1f00);
+    LCD_Fill(0, 12, LCD_W, LCD_H, WHITE);
+    LCD_Fill(0, 12, LCD_W, LCD_H, RED);
+    LCD_Fill(0, 12, LCD_W, LCD_H, BLACK);
+    LCD_Fill(0, 12, LCD_W, LCD_H, BLUE);
+    LCD_ShowIntNum(0, 0, time, 4, WHITE, BLACK, 12);
+    time++;
+}
+
+void LCD_ascii0806_test() {
+    LCD_ShowString(0, 40, (uint8_t *) " !\"#$%&'()*+,-./0123", BLACK, BLACK, 8, 1);
+    LCD_ShowString(0, 48, (uint8_t *) "456789:;<=>?@ABCDEFGH", BLACK, BLACK, 8, 1);
+    LCD_ShowString(0, 56, (uint8_t *) "IJKLMNOPQRSTUVWXYZ[\\]", BLACK, BLACK, 8, 1);
+    LCD_ShowString(0, 64, (uint8_t *) "^_`abcdefghijklmnopqr", BLACK, BLACK, 8, 1);
+    LCD_ShowString(0, 72, (uint8_t *) "stuvwxyz{|}~", BLACK, BLACK, 8, 1);
+}
 
 /* USER CODE END PFP */
 
@@ -69,9 +104,7 @@ void SystemClock_Config(void);
   * @brief  The application entry point.
   * @retval int
   */
-int main(void)
-{
-
+int main(void) {
     /* USER CODE BEGIN 1 */
 
     /* USER CODE END 1 */
@@ -99,91 +132,13 @@ int main(void)
     MX_USART1_UART_Init();
     /* USER CODE BEGIN 2 */
     LCD_Init();
-    LCD_Fill(0, 0, LCD_W, LCD_H, 0x001f);
-/*    LCD_DrawLine(20, 20, 40, 40, BLUE);
-    LCD_DrawRectangle(60, 40, 80, 80, BLACK);
-    Draw_Circle(LCD_W / 2, LCD_H / 2, LCD_W / 2, WHITE);*/
-    /*LCD_ShowString(0, 0, (unsigned char *) "STM32F103C8T6STM32F10", WHITE, BLACK, 12, 0);
-    LCD_ShowChinese(0, 20, (uint8_t *) "优信电子", WHITE, BLACK, 16, 0);*/
-    /*   LCD_ShowPicture(0, 0, 40, 40, gImage_qq);
-       LCD_ShowPicture(40, 0, 40, 40, gImage_qq);
-       LCD_ShowPicture(80, 0, 40, 40, gImage_qq);
-       LCD_ShowPicture(0, 40, 40, 40, gImage_qq);
-       LCD_ShowPicture(40, 40, 40, 40, gImage_qq);
-       LCD_ShowPicture(80, 40, 40, 40, gImage_qq);*/
+    LCD_Fill(0, 0, LCD_W, LCD_H, WHITE);
+    LCD_ascii0806_test();
     /* USER CODE END 2 */
 
     /* Infinite loop */
     /* USER CODE BEGIN WHILE */
     while (1) {
-        LCD_ShowIntNum(0, 0, time, 8, WHITE, BLACK, 12);
-        LCD_Fill(0, 12, LCD_W, LCD_H, RED);
-        LCD_ShowIntNum(0, 0, time, 8, WHITE, BLACK, 12);
-
-        LCD_Fill(0, 12, LCD_W, LCD_H, BLUE);
-        LCD_ShowIntNum(0, 0, time, 8, WHITE, BLACK, 12);
-
-        LCD_Fill(0, 12, LCD_W, LCD_H, GRAY);
-        LCD_ShowIntNum(0, 0, time, 8, WHITE, BLACK, 12);
-
-        LCD_Fill(0, 12, LCD_W, LCD_H, WHITE);
-        LCD_ShowIntNum(0, 0, time, 8, WHITE, BLACK, 12);
-
-        //HAL_UART_Transmit_DMA(&huart1, (uint8_t *) &fps, 1);
-        LCD_Fill(0, 12, LCD_W, LCD_H, RED);
-        LCD_ShowIntNum(0, 0, time, 8, WHITE, BLACK, 12);
-
-        LCD_Fill(0, 12, LCD_W, LCD_H, BLUE);
-        LCD_ShowIntNum(0, 0, time, 8, WHITE, BLACK, 12);
-
-        LCD_Fill(0, 12, LCD_W, LCD_H, GRAY);
-        LCD_ShowIntNum(0, 0, time, 8, WHITE, BLACK, 12);
-
-        LCD_Fill(0, 12, LCD_W, LCD_H, WHITE);
-        LCD_ShowIntNum(0, 0, time, 8, WHITE, BLACK, 12);
-
-        //HAL_UART_Transmit_DMA(&huart1, (uint8_t *) &fps, 1);
-
-        LCD_Fill(0, 12, LCD_W, LCD_H, RED);
-        LCD_ShowIntNum(0, 0, time, 8, WHITE, BLACK, 12);
-
-        LCD_Fill(0, 12, LCD_W, LCD_H, BLUE);
-        LCD_ShowIntNum(0, 0, time, 8, WHITE, BLACK, 12);
-
-        LCD_Fill(0, 12, LCD_W, LCD_H, GRAY);
-        LCD_ShowIntNum(0, 0, time, 8, WHITE, BLACK, 12);
-
-        LCD_Fill(0, 12, LCD_W, LCD_H, WHITE);
-        LCD_ShowIntNum(0, 0, time, 8, WHITE, BLACK, 12);
-
-        //HAL_UART_Transmit_DMA(&huart1, (uint8_t *) &fps, 1);
-
-        LCD_Fill(0, 12, LCD_W, LCD_H, RED);
-        LCD_ShowIntNum(0, 0, time, 8, WHITE, BLACK, 12);
-
-        LCD_Fill(0, 12, LCD_W, LCD_H, BLUE);
-        LCD_ShowIntNum(0, 0, time, 8, WHITE, BLACK, 12);
-
-        LCD_Fill(0, 12, LCD_W, LCD_H, GRAY);
-        LCD_ShowIntNum(0, 0, time, 8, WHITE, BLACK, 12);
-
-        LCD_Fill(0, 12, LCD_W, LCD_H, WHITE);
-        //HAL_UART_Transmit_DMA(&huart1, (uint8_t *) &fps, 1);
-        LCD_ShowIntNum(0, 0, time, 8, WHITE, BLACK, 12);
-
-        LCD_Fill(0, 12, LCD_W, LCD_H, RED);
-        LCD_ShowIntNum(0, 0, time, 8, WHITE, BLACK, 12);
-
-        LCD_Fill(0, 12, LCD_W, LCD_H, BLUE);
-        LCD_ShowIntNum(0, 0, time, 8, WHITE, BLACK, 12);
-
-        LCD_Fill(0, 12, LCD_W, LCD_H, GRAY);
-        LCD_ShowIntNum(0, 0, time, 8, WHITE, BLACK, 12);
-
-        LCD_Fill(0, 12, LCD_W, LCD_H, WHITE);
-        LCD_ShowIntNum(0, 0, prvetime, 8, WHITE, BLACK, 12);
-        time++;
-
         /* USER CODE END WHILE */
 
         /* USER CODE BEGIN 3 */
@@ -195,8 +150,7 @@ int main(void)
   * @brief System Clock Configuration
   * @retval None
   */
-void SystemClock_Config(void)
-{
+void SystemClock_Config(void) {
     RCC_OscInitTypeDef RCC_OscInitStruct = {0};
     RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
@@ -236,8 +190,7 @@ void SystemClock_Config(void)
   * @brief  This function is executed in case of error occurrence.
   * @retval None
   */
-void Error_Handler(void)
-{
+void Error_Handler(void) {
     /* USER CODE BEGIN Error_Handler_Debug */
     /* User can add his own implementation to report the HAL error return state */
     __disable_irq();

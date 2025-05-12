@@ -27,6 +27,7 @@ typedef struct {
     unsigned char Msk[128];
 } typFNT_UTF_8_32;
 
+extern const unsigned char ascii_0806[][8];
 extern const unsigned char ascii_1206[][12];
 extern const unsigned char ascii_1608[][16];
 extern const unsigned char ascii_2412[][48];

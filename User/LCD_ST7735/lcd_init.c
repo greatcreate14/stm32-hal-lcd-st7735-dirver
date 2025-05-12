@@ -2,69 +2,66 @@
 #include "pbdata.h"
 #include "spi.h"
 
-#define SPI_HARDWARE_SOFTWARE 0 //0:hardware SPI 1:software SPI
 
-void LCD_GPIO_Init(void)
-{
-    if (SPI_HARDWARE_SOFTWARE == 1) {
-        GPIO_InitTypeDef GPIO_InitStruct = {0};
+uint8_t SendBuffer[256];
 
-        /* GPIO Ports Clock Enable */
-        __HAL_RCC_GPIOA_CLK_ENABLE();
-        __HAL_RCC_GPIOB_CLK_ENABLE();
+void LCD_GPIO_Init(void) {
+#if SPI_HARDWARE_SOFTWARE == 1
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
 
-        /*Configure GPIO pin Output Level */
-        HAL_GPIO_WritePin(GPIOA, LCD_CS_Pin | LCD_SCL_Pin | LCD_SDA_Pin, GPIO_PIN_RESET);
+    /* GPIO Ports Clock Enable */
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    __HAL_RCC_GPIOB_CLK_ENABLE();
 
-        /*Configure GPIO pin Output Level */
-        HAL_GPIO_WritePin(GPIOB, LCD_RES_Pin | LCD_DC_Pin | LCD_BLK_Pin, GPIO_PIN_RESET);
+    /*Configure GPIO pin Output Level */
+    HAL_GPIO_WritePin(GPIOA, LCD_CS_Pin | LCD_SCL_Pin | LCD_SDA_Pin, GPIO_PIN_RESET);
 
-        /*Configure GPIO pins : PAPin PAPin PAPin */
-        GPIO_InitStruct.Pin = LCD_CS_Pin | LCD_SCL_Pin | LCD_SDA_Pin;
-        GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-        GPIO_InitStruct.Pull = GPIO_NOPULL;
-        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-        HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+    /*Configure GPIO pin Output Level */
+    HAL_GPIO_WritePin(GPIOB, LCD_RES_Pin | LCD_DC_Pin | LCD_BLK_Pin, GPIO_PIN_RESET);
 
-        /*Configure GPIO pins : PBPin PBPin PBPin */
-        GPIO_InitStruct.Pin = LCD_RES_Pin | LCD_DC_Pin | LCD_BLK_Pin;
-        GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-        GPIO_InitStruct.Pull = GPIO_NOPULL;
-        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-        HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-    } else {
-        GPIO_InitTypeDef GPIO_InitStruct = {0};
+    /*Configure GPIO pins : PAPin PAPin PAPin */
+    GPIO_InitStruct.Pin = LCD_CS_Pin | LCD_SCL_Pin | LCD_SDA_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-        /* GPIO Ports Clock Enable */
-        __HAL_RCC_GPIOA_CLK_ENABLE();
-        __HAL_RCC_GPIOB_CLK_ENABLE();
+    /*Configure GPIO pins : PBPin PBPin PBPin */
+    GPIO_InitStruct.Pin = LCD_RES_Pin | LCD_DC_Pin | LCD_BLK_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+#else
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
 
-        /*Configure GPIO pin Output Level */
-        HAL_GPIO_WritePin(GPIOA, LCD_CS_Pin, GPIO_PIN_RESET);
+    /* GPIO Ports Clock Enable */
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    __HAL_RCC_GPIOB_CLK_ENABLE();
 
-        /*Configure GPIO pin Output Level */
-        HAL_GPIO_WritePin(GPIOB, LCD_RES_Pin | LCD_DC_Pin | LCD_BLK_Pin, GPIO_PIN_RESET);
+    /*Configure GPIO pin Output Level */
+    HAL_GPIO_WritePin(GPIOA, LCD_CS_Pin, GPIO_PIN_RESET);
 
-        /*Configure GPIO pins : PAPin PAPin PAPin */
-        GPIO_InitStruct.Pin = LCD_CS_Pin;
-        GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-        GPIO_InitStruct.Pull = GPIO_NOPULL;
-        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-        HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+    /*Configure GPIO pin Output Level */
+    HAL_GPIO_WritePin(GPIOB, LCD_RES_Pin | LCD_DC_Pin | LCD_BLK_Pin, GPIO_PIN_RESET);
 
-        /*Configure GPIO pins : PBPin PBPin PBPin */
-        GPIO_InitStruct.Pin = LCD_RES_Pin | LCD_DC_Pin | LCD_BLK_Pin;
-        GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-        GPIO_InitStruct.Pull = GPIO_NOPULL;
-        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-        HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-    }
+    /*Configure GPIO pins : PAPin PAPin PAPin */
+    GPIO_InitStruct.Pin = LCD_CS_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
+    /*Configure GPIO pins : PBPin PBPin PBPin */
+    GPIO_InitStruct.Pin = LCD_RES_Pin | LCD_DC_Pin | LCD_BLK_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+#endif
 }
 
-void LCD_spi_init(void)
-{
-
+void LCD_spi_init(void) {
 }
 
 /******************************************************************************
@@ -72,29 +69,26 @@ void LCD_spi_init(void)
       入口数据：dat  要写入的串行数据
       返回值：  无
 ******************************************************************************/
-void LCD_Writ_Bus(u8 dat)
-{
-    if (SPI_HARDWARE_SOFTWARE == 1) {
-        u8 i;
-        LCD_CS_Clr();
-        for (i = 0; i < 8; i++) {
-            LCD_SCLK_Clr();
-            if (dat & 0x80) {
-                LCD_MOSI_Set();
-            } else {
-                LCD_MOSI_Clr();
-            }
-            LCD_SCLK_Set();
-            dat <<= 1;
+void LCD_Writ_Bus(u8 dat) {
+#if SPI_HARDWARE_SOFTWARE == 1
+    u8 i;
+    LCD_CS_Clr();
+    for (i = 0; i < 8; i++) {
+        LCD_SCLK_Clr();
+        if (dat & 0x80) {
+            LCD_MOSI_Set();
+        } else {
+            LCD_MOSI_Clr();
         }
-        LCD_CS_Set();
-    } else {
-        LCD_CS_Clr();
-        HAL_SPI_Transmit(&hspi1, &dat, 1, HAL_MAX_DELAY);
-        LCD_CS_Set();
+        LCD_SCLK_Set();
+        dat <<= 1;
     }
-
-
+    LCD_CS_Set();
+#else
+    LCD_CS_Clr();
+    HAL_SPI_Transmit(&hspi1, &dat, 1, HAL_MAX_DELAY);
+    LCD_CS_Set();
+#endif
 }
 
 
@@ -103,8 +97,7 @@ void LCD_Writ_Bus(u8 dat)
       入口数据：dat 写入的数据
       返回值：  无
 ******************************************************************************/
-void LCD_WR_DATA8(u8 dat)
-{
+void LCD_WR_DATA8(u8 dat) {
     LCD_Writ_Bus(dat);
 }
 
@@ -114,10 +107,16 @@ void LCD_WR_DATA8(u8 dat)
       入口数据：dat 写入的数据
       返回值：  无
 ******************************************************************************/
-void LCD_WR_DATA(u16 dat)
-{
+void LCD_WR_DATA(u16 dat) {
     LCD_Writ_Bus(dat >> 8);
     LCD_Writ_Bus(dat);
+}
+
+void LCD_WR_DATA_DMA(u8 *dat, u32 len) {
+    LCD_CS_Clr();
+    HAL_SPI_Transmit_DMA(&hspi1, dat, len);
+    while (HAL_SPI_GetState(&hspi1) != HAL_SPI_STATE_READY);
+    LCD_CS_Set();
 }
 
 
@@ -126,11 +125,10 @@ void LCD_WR_DATA(u16 dat)
       入口数据：dat 写入的命令
       返回值：  无
 ******************************************************************************/
-void LCD_WR_REG(u8 dat)
-{
-    LCD_DC_Clr();//写命令
+void LCD_WR_REG(u8 dat) {
+    LCD_DC_Clr(); //写命令
     LCD_Writ_Bus(dat);
-    LCD_DC_Set();//写数据
+    LCD_DC_Set(); //写数据
 }
 
 
@@ -140,54 +138,51 @@ void LCD_WR_REG(u8 dat)
                 y1,y2 设置行的起始和结束地址
       返回值：  无
 ******************************************************************************/
-void LCD_Address_Set(u16 x1, u16 y1, u16 x2, u16 y2)
-{
-
+void LCD_Address_Set(u16 x1, u16 y1, u16 x2, u16 y2) {
     if (USE_HORIZONTAL == 0) {
-        LCD_WR_REG(0x2a);//列地址设置
+        LCD_WR_REG(0x2a); //列地址设置
         LCD_WR_DATA(x1);
         LCD_WR_DATA(x2);
-        LCD_WR_REG(0x2b);//行地址设置
+        LCD_WR_REG(0x2b); //行地址设置
         LCD_WR_DATA(y1);
         LCD_WR_DATA(y2);
-        LCD_WR_REG(0x2c);//储存器写
+        LCD_WR_REG(0x2c); //储存器写
     } else if (USE_HORIZONTAL == 1) {
-        LCD_WR_REG(0x2a);//列地址设置
+        LCD_WR_REG(0x2a); //列地址设置
         LCD_WR_DATA(x1);
         LCD_WR_DATA(x2);
-        LCD_WR_REG(0x2b);//行地址设置
+        LCD_WR_REG(0x2b); //行地址设置
         LCD_WR_DATA(y1);
         LCD_WR_DATA(y2);
-        LCD_WR_REG(0x2c);//储存器写
+        LCD_WR_REG(0x2c); //储存器写
     } else if (USE_HORIZONTAL == 2) {
-        LCD_WR_REG(0x2a);//列地址设置
+        LCD_WR_REG(0x2a); //列地址设置
         LCD_WR_DATA(x1);
         LCD_WR_DATA(x2);
-        LCD_WR_REG(0x2b);//行地址设置
+        LCD_WR_REG(0x2b); //行地址设置
         LCD_WR_DATA(y1);
         LCD_WR_DATA(y2);
-        LCD_WR_REG(0x2c);//储存器写
+        LCD_WR_REG(0x2c); //储存器写
     } else {
-        LCD_WR_REG(0x2a);//列地址设置
+        LCD_WR_REG(0x2a); //列地址设置
         LCD_WR_DATA(x1);
         LCD_WR_DATA(x2);
-        LCD_WR_REG(0x2b);//行地址设置
+        LCD_WR_REG(0x2b); //行地址设置
         LCD_WR_DATA(y1);
         LCD_WR_DATA(y2);
-        LCD_WR_REG(0x2c);//储存器写
+        LCD_WR_REG(0x2c); //储存器写
     }
 }
 
-void LCD_Init(void)
-{
-    LCD_GPIO_Init();//初始化GPIO
+void LCD_Init(void) {
+    LCD_GPIO_Init(); //初始化GPIO
     LCD_spi_init();
-    LCD_RES_Clr();//复位
+    LCD_RES_Clr(); //复位
     delay_ms(100);
     LCD_RES_Set();
     delay_ms(100);
 
-    LCD_BLK_Set();//打开背光
+    LCD_BLK_Set(); //打开背光
     delay_ms(100);
 
     LCD_WR_REG(0x11); //Sleep out
